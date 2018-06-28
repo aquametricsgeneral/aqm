@@ -1,0 +1,21 @@
+.container {
+    margin: auto;
+    padding: 10px;
+}
+.gauge {
+    float: left;
+}
+
+#left {
+    width: 300px;
+    float: left;
+}
+
+#right {
+    margin-left: 1000px;
+      /* Change this to whatever the width of your left column is*/
+}
+
+.clear {
+      clear: both;
+}

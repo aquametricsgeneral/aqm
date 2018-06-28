@@ -1,0 +1,44 @@
+{% extends 'frontend/aquametrics_base.html' %}
+{% load static %}
+
+{% block page-name %}Home{% endblock %}
+
+{% block bottom-icon %}
+<script>
+  $("#home-icon").toggleClass("text-secondary");
+  $("#home-icon").toggleClass("text-success");
+  $("#home-text").toggleClass("text-secondary");
+  $("#home-text").toggleClass("text-success");
+</script>
+{% endblock %}
+
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.3.1/dt-1.10.18/r-2.2.2/datatables.min.css"/>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-3.3.1/dt-1.10.18/r-2.2.2/datatables.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
+<main role="main" class="container events-container">
+    <div class="row p-2 fixed-top last-updated">
+      <div class="col text-center">
+        <span class="fas fa-history"></span><span id="monitor-last-updated"></span>
+      </div>
+    </div>
+    <div>
+        <table id="statusTable"class="display responsive nowrap" style="width:100%">
+            <thead>
+              <th data-priority="1">Sensor</th>
+              <th>Alarm</th>
+              <th>Date & Time</th>
+              <th>Value</th>
+              <th>Lower Limit</th>
+              <th>Upper Limit</th>
+              <th data-priority="2">Status</th>
+            </thead>
+        </table>
+    </div>
+</main>
+
+<script src="{% static "monitor/events.js" %}"></script>
+
+{% endblock %}

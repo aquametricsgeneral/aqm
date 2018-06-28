@@ -1,0 +1,208 @@
+{% extends 'chart/chart_base.html' %}
+
+{% block page-name %}Chart{% endblock %}
+
+{% block bottom-icon %}
+<script>
+  $("#chart-icon").toggleClass("text-secondary");
+  $("#chart-icon").toggleClass("text-success");
+  $("#chart-text").toggleClass("text-secondary");
+  $("#chart-text").toggleClass("text-success");
+</script>
+{% endblock %}
+
+{% block dropdown-menu-default %}
+<script>
+var url = window.location.href;
+var id = url.split('/')[4];
+
+switch (id) {
+  case 'EnvTemp':
+    document.getElementById('dropdownMenuButton_sensor').innerHTML = 'Air Temp';
+    break;
+
+  case 'WaterTempFishTank':
+    document.getElementById('dropdownMenuButton_sensor').innerHTML = 'Fish Tank Temp';
+    break;
+
+  case 'EnvHumidity':
+    document.getElementById('dropdownMenuButton_sensor').innerHTML = 'Humidity';
+    break;
+
+  case 'WaterPH':
+    document.getElementById('dropdownMenuButton_sensor').innerHTML = 'Water pH';
+    break;
+
+  case 'WaterFlowMain':
+    document.getElementById('dropdownMenuButton_sensor').innerHTML = 'Main Flow';
+    break;
+
+  case 'WaterFlowFishTank':
+    document.getElementById('dropdownMenuButton_sensor').innerHTML = 'Fish Tank Flow';
+    break;
+
+  case 'WaterFlowHorizGrow':
+    document.getElementById('dropdownMenuButton_sensor').innerHTML = 'Horizontal Flow';
+    break;
+
+  case 'WaterFlowVertGrow':
+    document.getElementById('dropdownMenuButton_sensor').innerHTML = 'Vertical Flow';
+    break;
+
+  case 'WaterLevel':
+    document.getElementById('dropdownMenuButton_sensor').innerHTML = 'Water Level';
+    break;
+
+  default:
+    console.log("Error");
+}
+</script>
+{% endblock %}
+
+{% block sensor %}
+var url = window.location.href;
+var id = url.split('/')[4];
+var label = '';
+var title = '';
+var callback = function(value, index, values) {return value;};
+
+switch (id) {
+  case 'EnvTemp':
+    label = 'Air Temp (°C)';
+    title = 'Air Temperature';
+    min = 20;
+    max = 50;
+    stepSize = 5;
+    break;
+
+  case 'WaterTempFishTank':
+    label = 'Fish Tank Temp (°C)';
+    title = 'Fish Tank Temperature';
+    min = 20;
+    max = 50;
+    stepSize = 5;
+    break;
+
+  case 'EnvHumidity':
+    label = 'Humidity (%)';
+    title = 'Humidity';
+    min = 40;
+    max = 100;
+    stepSize = 5;
+    break;
+
+  case 'WaterPH':
+    label = 'pH';
+    title = 'Water pH';
+    min = 4;
+    max = 8;
+    stepSize = 1;
+    break;
+
+  case 'WaterFlowMain':
+    label = 'MainFlow (l/min)';
+    title = 'Main Water Flow';
+    min = 0;
+    max = 10;
+    stepSize = 2;
+    break;
+
+  case 'WaterFlowFishTank':
+    label = 'Fish Tank Flow (l/min)';
+    title = 'Fish Tank Water Flow';
+    min = 0;
+    max = 1;
+    stepSize = 0.2;
+    break;
+
+  case 'WaterFlowHorizGrow':
+    label = 'Horizontal Flow (l/min)';
+    title = 'Horizontal Water Flow';
+    min = 0;
+    max = 4;
+    stepSize = 1;
+    break;
+
+  case 'WaterFlowVertGrow':
+    label = 'Vertical Flow (l/min)';
+    title = 'Vertical Water Flow';
+    min = 0;
+    max = 2;
+    stepSize = 0.5;
+    break;
+
+  case 'WaterLevel':
+    label = 'Water Level';
+    title = 'Water Level';
+    min = 0;
+    max = 4;
+    stepSize = 1;
+    callback = function(label, index, labels) {
+            switch (label) {
+                case 0:
+                    return 'ERROR';
+                case 1:
+                    return 'LOW';
+                case 2:
+                    return 'MID';
+                case 3:
+                    return 'FULL';
+                case 4:
+                    return 'FILLING';
+            }
+        };
+    break;
+
+  default:
+    console.log("Error");
+}
+
+var sensor = {data: {{ sensor_value|safe }}, label: label, title: title};
+{% endblock %}
+
+{% block ajax %}
+var url = window.location.href;
+var id = url.split('/')[4];
+var sensor_id = '';
+
+switch (id) {
+  case 'EnvTemp':
+    sensor_id = 'EnvTemp';
+    break;
+
+  case 'WaterTempFishTank':
+    sensor_id = 'WaterTempFishTank';
+    break;
+
+  case 'EnvHumidity':
+    sensor_id = 'EnvHumidity';
+    break;
+
+  case 'WaterPH':
+    sensor_id = 'WaterPH';
+    break;
+
+  case 'WaterFlowMain':
+    sensor_id = 'WaterFlowMain';
+    break;
+
+  case 'WaterFlowFishTank':
+    sensor_id = 'WaterFlowFishTank';
+    break;
+
+  case 'WaterFlowHorizGrow':
+    sensor_id = 'WaterFlowHorizGrow';
+    break;
+
+  case 'WaterFlowVertGrow':
+    sensor_id = 'WaterFlowVertGrow';
+    break;
+
+  case 'WaterLevel':
+    sensor_id = 'WaterLevel';
+    break;
+
+  default:
+    console.log("Error");
+}
+{% endblock %}

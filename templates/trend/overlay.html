@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      {% load static %}
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <link rel="icon" href="{% static "frontend/aquametrics.ico" %}">
+
+      <title>Aquametrics Trend</title>
+      <!-- Bootstrap core CSS -->
+      <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+      <!-- Custom styles for this template -->
+      <link href="{% static "frontend/demo.css" %}" rel="stylesheet">
+
+      <!-- <link rel="stylesheet" type="text/css" href="{% static 'trend/trend.css' %}" /> -->
+
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bokeh/0.12.15/bokeh.min.css" type="text/css"/>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bokeh/0.12.15/bokeh-widgets.min.css" type="text/css"/>
+      <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/0.12.15/bokeh.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/0.12.15/bokeh-widgets.min.js"></script>
+      <script>
+      $( document ).ready(function() {
+      $( "#loadingStart" ).hide();
+      $( "#loadingStop" ).show();
+      });
+
+      $( document ).ajaxStart(function() {
+      $( "#loadingStart" ).show();
+      $( "#loadingStop" ).hide();
+      });
+
+      $( document ).ajaxStop(function() {
+      $( "#loadingStart" ).hide();
+      $( "#loadingStop" ).show();
+      });
+      </script>
+    </head>
+
+    <body>
+      <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
+        <a href="{% url "home" %}" class="navbar-left"><img src="{% static "frontend/aquametrics_logo.png" %}"></a>
+        <a class="navbar-brand" href="{% url "home" %}">Aquametrics</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'graph-only' %}">Graph</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'trend'%}">Trend Analysis</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+    <button class="graphBtn" name="EnvTemp">EnvTemp</button>
+    <button class="graphBtn" name="WaterTempFishTank">WaterTemp</button>
+    <button class="graphBtn" name="EnvHumidity">Humidity</button>
+    <button class="graphBtn" name="WaterPH">pH</button>
+    <button class="graphBtn" name="IsFilling">IsFilling</button>
+    <button class="graphBtn" name="WaterLevelLow">WaterLevelLow</button>
+    <button class="graphBtn" name="WaterLevelFull">WaterLevelFull</button>
+    <button class="graphBtn" name="WaterFlowFishTank">WaterFlowFishTank</button>
+    <button class="graphBtn" name="WaterFlowMain">WaterFlowMain</button>
+    <button class="graphBtn" name="WaterFlowVertGrow">WaterFlowVertGrow</button>
+    <button class="graphBtn" name="WaterFlowHorizGrow">WaterFlowHorizGrow</button>
+    <input type="button" value="All" onclick="window.open('http://139.99.97.75/trend/all')" />
+    <input type="button" value="All Waterflow" onclick="window.open('http://139.99.97.75/trend/allflow')" />
+
+    <script>
+    $( ".graphBtn" ).click(function() {
+        $.ajax({
+            type: "GET",
+            url: "/trend/ajax_overlay/",
+            data: {'sensor_id': this.name},
+            dataType: "json",
+            }).done(function(result) {
+            var bokeh_json = result;
+            var bokeh_script = bokeh_json['script'];
+            var bokeh_div = bokeh_json['div'];
+
+            var range = document.createRange();
+            // make the parent of the first div in the document becomes the context node
+            range.selectNode(document.getElementsByTagName("div").item(0));
+            var documentFragment1 = range.createContextualFragment(bokeh_div);
+            var documentFragment2 = range.createContextualFragment(bokeh_script);
+            document.body.appendChild(documentFragment1);
+            document.body.appendChild(documentFragment2);
+        });
+    });
+    </script>
+    <div id='loadingStart'><img src="{% static "graph/loading_start.gif" %}" alt="Refreshing..."/></div>
+    <div id='loadingStop'><img src="{% static "graph/loading_stop.png" %}" alt="Idling..."/></div>
+    <div></div>
+
+    </body>
+</html>

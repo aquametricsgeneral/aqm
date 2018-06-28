@@ -1,0 +1,372 @@
+{% extends 'frontend/aquametrics_base.html' %}
+{% load static %}
+
+{% block page-name %}Dashboard{% endblock %}
+
+{% block bottom-icon %}
+<script>
+  $("#dashboard-icon").toggleClass("text-secondary");
+  $("#dashboard-icon").toggleClass("text-success");
+  $("#dashboard-text").toggleClass("text-secondary");
+  $("#dashboard-text").toggleClass("text-success");
+</script>
+{% endblock %}
+
+{% block content %}
+<main role="main" class="dashboard-container">
+  <div class="row p-2 fixed-top last-updated">
+    <div class="col text-center">
+      <span class="fas fa-history"></span><span id="last-updated"></span>
+    </div>
+  </div>
+
+  <div class="container dashboard-container">
+    <div class="row">
+      <div class="col-6 col-md-3 text-center">
+        <canvas data-type="linear-gauge"
+                  data-width="100"
+                  data-height="200"
+                  data-units=""
+                  data-min-value="0"
+                  data-max-value="1"
+                  data-major-ticks="ERROR, OK"
+                  data-minor-ticks="2"
+                  data-stroke-ticks="true"
+                  data-highlights='[ {"from": 0, "to": 0, "color": "rgba(200, 50, 50, .75)"} ]'
+                  data-color-plate="#fff"
+                  data-border-shadow-width="0"
+                  data-borders="true"
+                  data-needle-type="arrow"
+                  data-needle-width="2"
+                  data-animation-duration="1500"
+                  data-animation-rule="linear"
+                  data-tick-side="left"
+                  data-number-side="left"
+                  data-needle-side="left"
+                  data-bar-stroke-width="1"
+                  data-bar-begin-circle="false"
+                  data-value="0"
+                  data-color-bar-progress="#26E131"
+                  data-color-bar="#FC2B12"
+                  data-value-int="1"
+                  data-value-dec="0"
+                  data-title="System Status"
+                  data-color-title="black"
+                  data-value-box=false
+                  id="gauge_10"
+        ></canvas>
+      </div>
+
+      <div class="col-6 col-md-3 text-center">
+        <a href="{% url "chart" 'WaterLevel' %}">
+          <canvas data-type="linear-gauge"
+                    data-width="100"
+                    data-height="200"
+                    data-units=""
+                    data-min-value="0"
+                    data-max-value="4"
+                    data-major-ticks="ERROR,LOW,MID,HIGH,FILLING"
+                    data-minor-ticks="2"
+                    data-stroke-ticks="true"
+                    data-highlights='[ {"from": 0, "to": 0, "color": "rgba(200, 50, 50, .75)"} ]'
+                    data-color-plate="#fff"
+                    data-border-shadow-width="0"
+                    data-borders="true"
+                    data-needle-type="arrow"
+                    data-needle-width="2"
+                    data-animation-duration="1500"
+                    data-animation-rule="linear"
+                    data-tick-side="left"
+                    data-number-side="left"
+                    data-needle-side="left"
+                    data-bar-stroke-width="1"
+                    data-bar-begin-circle="false"
+                    data-value="0"
+                    data-color-bar-progress="#2459F2"
+                    data-value-int="1"
+                    data-value-dec="0"
+                    data-title="Water Level"
+                    data-color-title="black"
+                    data-value-box=false
+                    id="gauge_9"
+          ></canvas>
+        </a>
+      </div>
+
+      <div class="col-6 col-md-3 text-center">
+        <a href="{% url "chart" 'EnvTemp' %}">
+          <canvas data-type="linear-gauge"
+              data-title="Air"
+              data-color-title="black"
+              data-width="100"
+              data-height="200"
+              data-units="°C"
+              data-min-value="0"
+              data-max-value="40"
+              data-major-ticks="0,10,20,30,40"
+              data-minor-ticks="10"
+              data-stroke-ticks="true"
+              data-highlights='[ {"from": 20, "to": 30, "color": "rgb(153, 255, 153)"} ]'
+              data-color-plate="#fff"
+              data-border-shadow-width="0"
+              data-borders="true"
+              data-needle-type="arrow"
+              data-needle-width="2"
+              data-animation-duration="1500"
+              data-animation-rule="linear"
+              data-tick-side="left"
+              data-number-side="left"
+              data-needle-side="left"
+              data-bar-stroke-width="3"
+              data-value="75"
+              data-color-bar-progress="#ff9999"
+              data-value-int="2"
+              data-color-units="black"
+              id="gauge_1"
+          ></canvas>
+        </a>
+
+      </div>
+        <div class="col-6 col-md-3 text-center">
+          <a href="{% url "chart" 'WaterTempFishTank' %}">
+            <canvas data-type="linear-gauge"
+                  data-title="Fish Tank"
+                  data-color-title="black"
+                  data-width="100"
+                  data-height="200"
+                  data-units="°C"
+                  data-min-value="0"
+                  data-max-value="40"
+                  data-major-ticks="0,10,20,30,40"
+                  data-minor-ticks="10"
+                  data-stroke-ticks="true"
+                  data-highlights='[ {"from": 20, "to": 30, "color": "rgb(153, 255, 153)"} ]'
+                  data-color-plate="#fff"
+                  data-border-shadow-width="0"
+                  data-borders="true"
+                  data-needle-type="arrow"
+                  data-needle-width="2"
+                  data-animation-duration="1500"
+                  data-animation-rule="linear"
+                  data-tick-side="left"
+                  data-number-side="left"
+                  data-needle-side="left"
+                  data-value="75"
+                  data-color-bar-progress="#ff9999"
+                  data-bar-stroke-width="3"
+                  data-value-int="2"
+                  data-color-units="black"
+                  id="gauge_2"
+            ></canvas>
+          </a>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-6 col-md-2">
+          <a href="{% url "chart" 'EnvHumidity' %}">
+            <canvas data-type="radial-gauge"
+                  data-title="Humidity"
+                  data-color-title="black"
+                  data-width="150"
+                  data-height="150"
+                  data-units="%"
+                  data-min-value="10"
+                  data-max-value="100"
+                  data-major-ticks="10,20,30,40,50,60,70,80,90,100"
+                  data-minor-ticks="10"
+                  data-stroke-ticks="true"
+                  data-highlights='[ {"from": 50, "to": 60, "color": "rgb(153, 255, 153)"} ]'
+                  data-color-plate="#fff"
+                  data-border-shadow-width="0"
+                  data-borders="true"
+                  data-needle-type="arrow"
+                  data-needle-width="2"
+                  data-animation-duration="1500"
+                  data-animation-rule="linear"
+                  data-tick-side="left"
+                  data-number-side="left"
+                  data-needle-side="left"
+                  data-value="75"
+                  data-color-bar-progress="#ff9999"
+                  data-value-int="1"
+                  data-color-units="black"
+                  id="gauge_4"
+            ></canvas>
+          </a>
+        </div>
+
+        <div class="col-6 col-md-2">
+          <a href="{% url "chart" 'WaterPH' %}">
+            <canvas data-type="radial-gauge"
+                  data-title="pH"
+                  data-color-title="black"
+                  data-width="150"
+                  data-height="150"
+                  data-units=""
+                  data-min-value="0"
+                  data-max-value="14"
+                  data-major-ticks="0,2,4,6,8,10,12,14"
+                  data-minor-ticks="10"
+                  data-stroke-ticks="true"
+                  data-highlights='[ {"from": 5, "to": 7, "color": "rgb(153, 255, 153)"} ]'
+                  data-color-plate="#fff"
+                  data-border-shadow-width="0"
+                  data-borders="true"
+                  data-needle-type="arrow"
+                  data-needle-width="2"
+                  data-animation-duration="1500"
+                  data-animation-rule="linear"
+                  data-tick-side="left"
+                  data-number-side="left"
+                  data-needle-side="left"
+                  data-value="75"
+                  data-color-bar-progress="#ff9999"
+                  data-value-int="1"
+                  data-color-units="black"
+                  id="gauge_3"
+            ></canvas>
+          </a>
+        </div>
+
+        <div class="col-6 col-md-2">
+          <a href="{% url "chart" 'WaterFlowMain' %}">
+            <canvas data-type="radial-gauge"
+                  data-title="Main Flow"
+                  data-color-title="black"
+                  data-width="150"
+                  data-height="150"
+                  data-units="l/min"
+                  data-min-value="0"
+                  data-max-value="16"
+                  data-major-ticks="0,2,4,6,8,10,12,14,16"
+                  data-minor-ticks="10"
+                  data-stroke-ticks="true"
+                  data-highlights='[ {"from": 6, "to": 9, "color": "rgb(153, 255, 153)"} ]'
+                  data-color-plate="#D6EAF8"
+                  data-border-shadow-width="0"
+                  data-borders="true"
+                  data-needle-type="arrow"
+                  data-needle-width="2"
+                  data-animation-duration="1500"
+                  data-animation-rule="linear"
+                  data-tick-side="left"
+                  data-number-side="left"
+                  data-needle-side="left"
+                  data-value="75"
+                  data-color-bar-progress="#ff9999"
+                  data-value-int="1"
+                  data-color-units="black"
+                  id="gauge_5"
+            ></canvas>
+          </a>
+        </div>
+
+        <div class="col-6 col-md-2">
+          <a href="{% url "chart" 'WaterFlowFishTank' %}">
+            <canvas data-type="radial-gauge"
+                  data-title="Fish Tank Flow"
+                  data-color-title="black"
+                  data-width="150"
+                  data-height="150"
+                  data-units="l/min"
+                  data-min-value="0"
+                  data-max-value="2"
+                  data-major-ticks="0,0.5,1,1.5,2"
+                  data-minor-ticks="10"
+                  data-stroke-ticks="true"
+                  data-highlights='[ {"from": 0.5, "to": 1, "color": "rgb(153, 255, 153)"} ]'
+                  data-color-plate="#D6EAF8"
+                  data-border-shadow-width="0"
+                  data-borders="true"
+                  data-needle-type="arrow"
+                  data-needle-width="2"
+                  data-animation-duration="1500"
+                  data-animation-rule="linear"
+                  data-tick-side="left"
+                  data-number-side="left"
+                  data-needle-side="left"
+                  data-value="75"
+                  data-color-bar-progress="#ff9999"
+                  data-value-int="1"
+                  data-color-units="black"
+                  id="gauge_6"
+            ></canvas>
+          </a>
+        </div>
+
+        <div class="col-6 col-md-2">
+          <a href="{% url "chart" 'WaterFlowVertGrow' %}">
+            <canvas data-type="radial-gauge"
+                  data-title="Vertical Flow"
+                  data-color-title="black"
+                  data-width="150"
+                  data-height="150"
+                  data-units="l/min"
+                  data-min-value="0"
+                  data-max-value="14"
+                  data-major-ticks="0,2,4,6,8,10,12,14"
+                  data-minor-ticks="10"
+                  data-stroke-ticks="true"
+                  data-highlights='[ {"from": 2, "to": 3, "color": "rgb(153, 255, 153)"} ]'
+                  data-color-plate="#D6EAF8"
+                  data-border-shadow-width="0"
+                  data-borders="true"
+                  data-needle-type="arrow"
+                  data-needle-width="2"
+                  data-animation-duration="1500"
+                  data-animation-rule="linear"
+                  data-tick-side="left"
+                  data-number-side="left"
+                  data-needle-side="left"
+                  data-value="75"
+                  data-color-bar-progress="#ff9999"
+                  data-value-int="1"
+                  data-color-units="black"
+                  id="gauge_7"
+            ></canvas>
+          </a>
+        </div>
+
+        <div class="col-6 col-md-2">
+          <a href="{% url "chart" 'WaterFlowHorizGrow' %}">
+            <canvas data-type="radial-gauge"
+                  data-title="Horizontal Flow"
+                  data-color-title="black"
+                  data-width="150"
+                  data-height="150"
+                  data-units="l/min"
+                  data-min-value="0"
+                  data-max-value="14"
+                  data-major-ticks="0,2,4,6,8,10,12,14"
+                  data-minor-ticks="10"
+                  data-stroke-ticks="true"
+                  data-highlights='[ {"from": 3, "to": 4, "color": "rgb(153, 255, 153)"} ]'
+                  data-color-plate="#D6EAF8"
+                  data-border-shadow-width="0"
+                  data-borders="true"
+                  data-needle-type="arrow"
+                  data-needle-width="2"
+                  data-animation-duration="1500"
+                  data-animation-rule="linear"
+                  data-tick-side="left"
+                  data-number-side="left"
+                  data-needle-side="left"
+                  data-value="75"
+                  data-color-bar-progress="#ff9999"
+                  data-value-int="1"
+                  data-color-units="black"
+                  id="gauge_8"
+            ></canvas>
+          </a>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script src="{% static "dashboard/dashboard.js"%}"></script>
+
+</main>
+
+{% endblock %}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+		<head>
+		    {% load static %}
+				<title>Aquametrics</title>
+				<meta charset="utf-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+				<meta name="description" content="">
+				<meta name="author" content="">
+				<link rel="icon" href="{% static "frontend/aquametrics.ico" %}">
+        <!-- <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
+				<script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+				<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
+				<!-- Custom styles for this template -->
+				<!-- Bootstrap core CSS -->
+				<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+				<link href="{% static "frontend/demo.css" %}" rel="stylesheet">
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+			<!-- script for Google Charts -->
+        <script type="text/javascript">
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.load('current', {'packages':['gauge']});
+
+           google.charts.setOnLoadCallback(function() {drawChart1('WaterPH','Water PH', 4, 8, 'Blue','pH', 'chartdiv_2');});
+           setInterval(function(){
+                google.charts.setOnLoadCallback(function() {drawChart1('WaterPH','Water PH', 4, 8, 'Blue','pH','chartdiv_2')})
+            }, 10000);
+
+            google.charts.setOnLoadCallback(function() {drawChart3A('EnvTemp', 'WaterTempFishTank', 'EnvHumidity',
+                                                          'EnvTemp / C', 'WaterTempFishTank / C', 'EnvHumidity / %',
+                                                          'Red', 'Green', 'Orange',
+                                                          'Temperature and Humidity', 'chartdiv_1');});
+            setInterval(function(){
+                google.charts.setOnLoadCallback(function() {drawChart3A('EnvTemp', 'WaterTempFishTank', 'EnvHumidity',
+                                                          'EnvTemp / C', 'WaterTempFishTank / C', 'EnvHumidity / %',
+                                                          'Red', 'Green', 'Orange',
+                                                          'Temperature and Humidity', 'chartdiv_1');})
+            }, 10000);
+
+            google.charts.setOnLoadCallback(function() {drawChart3B('WaterLevelLow', 'WaterLevelFull', 'IsFilling',
+                                                      'Mid', 'Full', 'Filling',
+                                                      'Blue', 'Blue', 'Blue',
+                                                      'Water Level', 'chartdiv_4');})
+            setInterval(function(){
+                google.charts.setOnLoadCallback(function() {drawChart3B('WaterLevelLow', 'WaterLevelFull', 'IsFilling',
+                                                          'Low', 'Full', 'Filling',
+                                                          'Blue', 'Blue', 'Blue',
+                                                          'Water Level', 'chartdiv_4');})
+            }, 10000);
+
+            google.charts.setOnLoadCallback(function() {drawChart4('WaterFlowFishTank', 'WaterFlowMain', 'WaterFlowVertGrow', 'WaterFlowHorizGrow',
+                                                      'Fish Tank', 'Main', 'Vertical', 'Horizontal',
+                                                      'Crimson', 'Coral', 'Indigo', 'Steelblue',
+                                                      'Water Flow', 'chartdiv_3');})
+            setInterval(function(){
+                google.charts.setOnLoadCallback(function() {drawChart4('WaterFlowFishTank', 'WaterFlowMain', 'WaterFlowVertGrow', 'WaterFlowHorizGrow',
+                                                          'Fish Tank', 'Main', 'Vertical', 'Horizontal',
+                                                          'Crimson', 'Coral', 'Indigo', 'Steelblue',
+                                                          'Water Flow', 'chartdiv_3');})
+            }, 10000);
+
+            $( document ).ajaxStart(function() {
+            $( "#loadingStart" ).show();
+            $( "#loadingStop" ).hide();
+            });
+
+            $( document ).ajaxStop(function() {
+            $( "#loadingStart" ).hide();
+            $( "#loadingStop" ).show();
+            });
+
+           {% include "graph/drawchart_integrated.html" %};
+        </script>
+        <script type="text/javascript">
+            window.onload = function() { document.getElementById("time").innerHTML = moment().toString(); };
+        </script>
+		</head>
+		<body>
+				<nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
+					<a href="{% url "home" %}" class="navbar-left"><img src="{% static "frontend/aquametrics_logo.png" %}"></a>
+					<a class="navbar-brand" href="{% url "home" %}">Aquametrics</a>
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="navbarCollapse">
+						<ul class="navbar-nav mr-auto">
+							<li class="nav-item active">
+								<a class="nav-link" href="{% url 'graph-only' %}">Graph</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="{% url 'trend'%}">Trend Analysis</a>
+							</li>
+						</ul>
+					</div>
+				</nav>
+			        <section class="container">
+                        <div id='loadingStart'><img src="{% static "graph/loading_start.gif" %}" alt="Refreshing..."/></div>
+                        <div id='loadingStop'><img src="{% static "graph/loading_stop.png" %}" alt="Idling..."/></div>
+                        <div>Graphs' dates and times plotted at this timezone:</div></br>
+												<div id='time'></div></br>
+                </section>
+		            <div id="container">
+	    				        <div id='chartdiv_1'></div>
+	    				        <div id='chartdiv_2'></div>
+	    				        <div id='chartdiv_3'></div>
+	    				        <div id='chartdiv_4'></div>
+			        </div>
+		</body>
+</html>

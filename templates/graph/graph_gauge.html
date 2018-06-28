@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'graph/dashboard.css' %}" />
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript">
+    // Load the Visualization API and the piechart package.
+    google.charts.load('current', {'packages':['gauge']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.charts.setOnLoadCallback(function(){drawChart('EnvTemp', 'chartdiv_1', 20, 40, 25, 35);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('EnvTemp', 'chartdiv_1', 20, 40, 25, 35);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('WaterTempFishTank', 'chartdiv_2', 20, 40, 25, 35);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('WaterTempFishTank', 'chartdiv_2', 20, 40, 25, 35);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('EnvHumidity', 'chartdiv_3', 40, 100, 60, 90);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('EnvHumidity', 'chartdiv_3', 50, 100, 60, 90);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('WaterPH', 'chartdiv_4', 4, 8, 6, 7);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('WaterPH', 'chartdiv_4', 4, 8, 6, 7);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('IsRain', 'chartdiv_5', 100, 1000, 9999, 99999);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('IsRain', 'chartdiv_5', 100, 1000, 9999, 99999);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('WaterLevelLow', 'chartdiv_6', 0, 1, 9999, 99999);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('WaterLevelLow', 'chartdiv_6', 0, 1, 9999, 99999);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('WaterLevelFull', 'chartdiv_7', 0, 1, 9999, 99999);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('WaterLevelFull', 'chartdiv_7', 0, 1, 9999, 99999);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('IsFilling', 'chartdiv_8', 0, 1, 9999, 99999);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('IsFilling', 'chartdiv_8', 0, 1, 9999, 99999);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('WaterFlowFishTank', 'chartdiv_9', 0, 16, 9999, 99999);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('WaterFlowFishTank', 'chartdiv_9', 0, 16, 9999, 99999);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('WaterFlowMain', 'chartdiv_10', 0, 16, 9999, 99999);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('WaterFlowMain', 'chartdiv_10', 0, 16, 9999, 99999);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('WaterFlowVertGrow', 'chartdiv_11', 0, 16, 9999, 99999);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('WaterFlowVertGrow', 'chartdiv_11', 0, 16, 9999, 99999);})}, 10000);
+
+    google.charts.setOnLoadCallback(function(){drawChart('WaterFlowHorizGrow', 'chartdiv_12', 0, 16, 9999, 99999);});
+    setInterval(function(){google.charts.setOnLoadCallback(function(){drawChart('WaterFlowHorizGrow', 'chartdiv_12', 0, 16, 9999, 99999);})}, 10000);
+
+    $( document ).ajaxStart(function() {
+    $( "#loadingStart" ).show();
+    $( "#loadingStop" ).hide();
+    });
+
+    $( document ).ajaxStop(function() {
+    $( "#loadingStart" ).hide();
+    $( "#loadingStop" ).show();
+    });
+
+    function drawChart(sensor_id, chartdiv, minValue, maxValue, greenF, greenT) {
+            $.ajax({
+                type: "GET",
+                url: "/graph/ajax_data_for_gauge/",
+                dataType: "json",
+                data: {'sensor_id': sensor_id},
+            }).done(function(result){
+                var jsonData = result;
+
+                console.log(jsonData)
+
+                var data = new google.visualization.DataTable();
+
+                var SensorArray = jsonData;
+
+                for (var i=0, len=SensorArray.length; i<len; i++) {
+                SensorArray[i][1] = Number(SensorArray[i][1]);
+                };
+
+                data.addColumn('string', 'Label');
+                data.addColumn('number', 'Value');
+                data.addRows(SensorArray);
+
+                var options = {
+                min: minValue,
+                max: maxValue,
+                width: 300, height: 300,
+                greenFrom: greenF, greenTo: greenT,
+                minorTicks: 10
+                };
+
+                var chart = new google.visualization.Gauge(document.getElementById(chartdiv));
+
+                chart.draw(data, options);
+            });
+    }
+    </script>
+    <script type="text/javascript">
+        window.onload = function() { document.getElementById("time").innerHTML = moment().toString(); };
+    </script>
+  </head>
+
+  <body>
+    <section class="container">
+        <h1>Aquametrics</h1>
+        <div id="loadingStart"><img src="{% static "graph/loading_start.gif" %}" alt="Refreshing..."/></div>
+        <div id="loadingStop"><img src="{% static "graph/loading_stop.png" %}" alt="Idling..."/></div>
+		<div>Gauges plotted at this timezone:</div></br>
+		<div id='time'></div></br>
+    </section>
+    <section class="container">
+        <div id="chartdiv_1" class="gauge"></div>
+        <div id="chartdiv_2" class="gauge"></div>
+        <div id="chartdiv_3" class="gauge"></div>
+        <div id="chartdiv_4" class="gauge"></div>
+        <div id="chartdiv_5" class="gauge"></div>
+        <div id="chartdiv_6" class="gauge"></div>
+        <div id="chartdiv_7" class="gauge"></div>
+        <div id="chartdiv_8" class="gauge"></div>
+        <div id="chartdiv_9" class="gauge"></div>
+        <div id="chartdiv_10" class="gauge"></div>
+        <div id="chartdiv_11" class="gauge"></div>
+        <div id="chartdiv_12" class="gauge"></div>
+    </section>
+  </body>
+</html>

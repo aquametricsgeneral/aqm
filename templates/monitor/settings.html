@@ -1,0 +1,93 @@
+{% extends 'frontend/aquametrics_base.html' %}
+{% load static %}
+
+{% block page-name %}Settings{% endblock %}
+
+{% block bottom-icon %}
+<script>
+  $("#settings-icon").toggleClass("text-secondary");
+  $("#settings-icon").toggleClass("text-success");
+  $("#settings-text").toggleClass("text-secondary");
+  $("#settings-text").toggleClass("text-success");
+</script>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.2.0/css/ion.rangeSlider.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.2.0/css/ion.rangeSlider.skinHTML5.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.2.0/js/ion.rangeSlider.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css">
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
+<main role="main" class="container settings-container">
+  <div class="row">
+    <div class="col">
+      <form action="" method="post" id="setting_form" name="setting_form">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        {% if perms.monitor.change_AlertSetting %}
+        <div class="text-center fixed-bottom" id="save-btn">
+          <input type="submit" value="Save Settings" class="btn btn-primary"/>
+        </div>
+        {% else %}
+        <div class="p-3 mb-2 bg-warning text-dark text-center">Saving of settings not available for demo users.</div>
+        {% endif %}
+
+        <!-- hidden input takes in value from the variable saved_alert to trigger SweetAlert if settings are successfully saved -->
+        <input type="hidden" name="saved_alert" value="{{saved_alert}}" id="saved_alert" readonly />
+
+
+        <div class="container">
+          <!-- unpack the forms in the formset -->
+          {% for form in formset%}
+          <hr>
+            <!-- form.sensor is required for proper form submission, but its wordings are not suitable for display, hence form.label is used for display instead -->
+            <!-- form.lowerlimit and form.upperlimit are required for proper form submission, but not displaying them since these values are already showing on the sliders -->
+            <div class="row">
+              <div class="col d-none">
+                {{ form.sensor }} {{ form.lowerlimit }} {{ form.upperlimit }}
+              </div>
+            </div>
+
+            <!-- this row for the label and alarm switch -->
+            <div class="row text-center">
+              <div class="col">
+                <span class="form-label">
+                  {{ form.label }}
+                </span>
+                <span class="far fa-bell"></span>
+                <span class="pretty p-switch p-fill">
+                    {{ form.alert }}
+                    <div class="state p-success">
+                        <label></label>
+                    </div>
+                </span>
+              </div>
+            </div>
+
+            <!-- this row for the Last Saved values -->
+            <div class="row">
+              <div class="col-12 text-center">
+                <span class="fas fa-history"></span><span id="last_saved_{{ forloop.counter0 }}" class="text-center"></span>
+              </div>
+            </div>
+
+            <!-- this row for the slider -->
+            <div class="row">
+              <div class="col">
+                {{ form.slider }}
+              </div>
+            </div>
+
+            {% endfor %}
+          </div>
+        </div>
+     </form>
+  </div>
+</main>
+
+<script src="{% static "monitor/settings.js" %}"></script>
+
+{% endblock %}

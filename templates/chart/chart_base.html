@@ -1,0 +1,186 @@
+{% extends "frontend/aquametrics_base.html" %}
+{% load static %}
+
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+<script src="{% static "chart/utils.js" %}"></script>
+
+<main role="main" class="chart-container">
+  <!-- dropdown menu -->
+  <div class="container">
+    <div class="row">
+        <div class="dropdown col-6">
+            <button class="btn btn-block btn-primary dropdown-toggle" type="button" id="dropdownMenuButton_duration" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Last 1 hour
+              <span class="caret"></span>
+            </button>
+            <ul id="duration_selection" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <li><a class="dropdown-item" href="#" data-value="1">Last 1 hour</a></li>
+              <li><a class="dropdown-item" href="#" data-value="6">Last 6 hours</a></li>
+              <li><a class="dropdown-item" href="#" data-value="12">Last 12 hours</a></li>
+              <li><a class="dropdown-item" href="#" data-value="24">Last 1 day</a></li>
+              <li><a class="dropdown-item" href="#" data-value="168">Last 7 days</a></li>
+              <li><a class="dropdown-item" href="#" data-value="720">Last 1 month</a></li>
+            </ul>
+        </div>
+        <div class="dropdown col-6">
+              <button class="btn btn-block btn-primary dropdown-toggle" type="button" id="dropdownMenuButton_sensor" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% block dropdown-menu-default %}
+                {% endblock %}
+                <span class="caret"></span>
+              </button>
+              <ul id="sensor_selection" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="{% url "chart" 'EnvTemp' %}">Air Temp</a></li>
+                <li><a class="dropdown-item" href="{% url "chart" 'WaterTempFishTank' %}">Fish Tank Temp</a></li>
+                <li><a class="dropdown-item" href="{% url "chart" 'EnvHumidity' %}">Humidity</a></li>
+                <li><a class="dropdown-item" href="{% url "chart" 'WaterPH' %}">Water pH</a></li>
+                <li><a class="dropdown-item" href="{% url "chart" 'WaterFlowMain' %}">Main Flow</a></li>
+                <li><a class="dropdown-item" href="{% url "chart" 'WaterFlowFishTank' %}">Fish Tank Flow</a></li>
+                <li><a class="dropdown-item" href="{% url "chart" 'WaterFlowHorizGrow' %}">Horizontal Flow</a></li>
+                <li><a class="dropdown-item" href="{% url "chart" 'WaterFlowVertGrow' %}">Vertical Flow</a></li>
+                <li><a class="dropdown-item" href="{% url "chart" 'WaterLevel' %}">Water Level</a></li>
+              </ul>
+        </div>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <span class="d-inline-block text-center" id="duration_start">{{duration_start}}</span>
+    <span class="fas fa-chevron-left d-inline-block"></span>
+    <span class="fas fa-chevron-right d-inline-block"></span>
+    <span class="d-inline-block text-center" id="duration_end">{{duration_end}}</span>
+  </div>
+
+
+  <div class="canvas-chart" >
+    <canvas id="chart"></canvas>
+  </div>
+</main>
+
+<script>
+    {% block sensor %}
+    {% endblock %}
+
+    // receive data from Django
+    var SensorArray = sensor.data;
+    //console.log(SensorArray);
+
+    var color = Chart.helpers.color;
+    var config = {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: sensor.label,
+          backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+          borderColor: window.chartColors.red,
+          fill: false,
+          data: SensorArray,
+        }]
+      },
+      options: {
+        legend: {
+            display: false
+        },
+        tooltips: {
+                   callbacks: {
+                       label: function(tooltipItem, data) {
+                           var label = data.datasets[tooltipItem.datasetIndex].label || '';
+
+                           if (label) {
+                               label += ': ';
+                           }
+                           label += Math.round(tooltipItem.yLabel * 10) / 10;
+                           return label;
+                       },
+
+                       title: function(){
+                       },
+
+                       beforeLabel: function(tooltipItem, data) {
+                           var beforeLabel = tooltipItem.xLabel;
+                           var beforeLabel = moment(beforeLabel).format('h:mm a, DD-MMM-YY');
+                           return beforeLabel;
+                       },
+                   }
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        title: {
+          display: true,
+          text: sensor.title
+        },
+        scales: {
+          xAxes: [{
+            type: 'time',
+            display: true,
+            scaleLabel: {
+              display: false,
+              labelString: 'Date'
+            },
+            ticks: {
+              major: {
+                fontStyle: 'bold',
+                fontColor: '#FF0000'
+              }
+            }
+          }],
+          yAxes: [{
+            display: true,
+            scaleLabel: {
+              display: false,
+              labelString: 'value'
+            },
+            ticks: {
+              min: min,
+              max: max,
+              stepSize: stepSize,
+              callback: callback,
+            }
+          }]
+        },
+        elements: {
+            point: {
+              radius: 0,
+              hitRadius: 10,
+              hoverRadius: 3,
+            }
+        }
+      }
+    };
+
+    window.onload = function() {
+      var ctx = document.getElementById('chart').getContext('2d');
+      var chart = new Chart(ctx, config);
+
+      $("#duration_selection li a").click(function(){
+        $(this).parents(".dropdown").find('.btn-block').html($(this).text() + ' <span class="caret"></span>');
+        $(this).parents(".dropdown").find('.btn-block').val($(this).data('value'));
+        var duration = $(this).data("value");
+        {% block ajax %}
+        {% endblock %}
+        $.ajax({
+            type: "GET",
+            url: "/chart/ajax_chart/",
+            dataType: "json",
+            data: {'sensor_id': sensor_id, 'duration': duration},
+        }).done(function(result){
+            var ajaxData = result;
+
+            function updateConfigByMutating(chart) {
+                chart.data.datasets[0].data = ajaxData;
+                chart.update();
+            }
+
+            updateConfigByMutating(chart);
+
+            var duration_start = moment( ajaxData[0]['x']).format('hh:mm a, DD-MMM-YY');
+            var duration_end = moment(ajaxData[ajaxData.length-1]['x']).format('hh:mm a, DD-MMM-YY');
+            document.getElementById("duration_start").innerHTML = duration_start;
+            document.getElementById("duration_end").innerHTML = duration_end;
+          });
+      });
+    };
+</script>
+
+{% endblock %}

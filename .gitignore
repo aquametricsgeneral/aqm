@@ -1,0 +1,12 @@
+*.pyc
+*~
+__pycache__
+airquality/
+chat/
+aquametrics.sock
+celerybeat-schedule
+celery-node1.pid
+nano.save
+node.status
+ph.counter
+uwsgi_params

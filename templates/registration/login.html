@@ -1,0 +1,25 @@
+{% extends "frontend/aquametrics_base.html" %}
+
+{% block content %}
+    {% load static %}
+    <form method="post" action="{% url 'login' %}" class="form-signin mt-5">
+      {% csrf_token %}
+      <img class="mb-4 d-inline" src="{% static "frontend/aquametrics_logo.png" %}" alt="">
+      <h1 class="h3 mb-3 font-weight-normal d-inline">Aquametrics</h1>
+      <label for="inputUsername" class="sr-only">Usesrname</label>
+      <input type="text" name="username" id="id_username" maxlength="254" class="form-control" placeholder="Username" required autofocus>
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" name="password" id="id_password" class="form-control" placeholder="Password" required>
+      <!-- <div class="checkbox mb-3">
+        <label>
+          <input type="checkbox" value="remember-me"> Remember me
+        </label>
+      </div> -->
+      <input class="btn btn-lg btn-primary btn-block" type="submit" value="Login"></input>
+      <!-- <input type="hidden" name="next" value="{{ next }}" /> -->
+      <p class="mt-5 mb-3 text-muted">&copy; 2017-2018</p>
+    </form>
+    {% if form.errors %}
+        <p class="mt-5 text-center text-danger">Your username and password didn't match. Please try again.</p>
+    {% endif %}
+{% endblock %}

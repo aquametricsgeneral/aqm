@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+		<head>
+		        {% load static %}
+
+				<title>Aquametrics</title>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.14/moment-timezone-with-data-2012-2022.min.js"></script>
+				<script src="https://www.gstatic.com/charts/loader.js"></script>
+                <script>
+                    google.charts.load('current', {'packages':['corechart']});
+
+                    google.charts.setOnLoadCallback(function() {drawChart2(WaterPH, IsRain,
+                                                                  'Water PH', 'Rain Detector',
+                                                                  'Blue', 'Yellow',
+                                                                  'pH and Rain Detection', 'chartdiv_2');});
+
+                    google.charts.setOnLoadCallback(function() {drawChart3A(EnvTemp, WaterTempFishTank, EnvHumidity,
+                                                                  'EnvTemp / C', 'WaterTempFishTank / C', 'EnvHumidity / %',
+                                                                  'Red', 'Green', 'Orange',
+                                                                  'Temperature and Humidity', 'chartdiv_1');});
+
+                    google.charts.setOnLoadCallback(function() {drawChart3B(WaterLevelLow, WaterLevelFull, IsFilling,
+                                                                  'Mid', 'Full', 'Filling',
+                                                                  'Blue', 'Blue', 'Blue',
+                                                                  'Water Level', 'chartdiv_4');});
+
+                    google.charts.setOnLoadCallback(function() {drawChart4(WaterFlowFishTank, WaterFlowMain, WaterFlowVertGrow, WaterFlowHorizGrow,
+                                                                  'Fish Tank', 'Main', 'Vertical', 'Horizontal',
+                                                                  'Crimson', 'Coral', 'Indigo', 'Steelblue',
+                                                                  'Water Flow', 'chartdiv_3');});
+                </script>
+                <script>
+                   {% include "graph/drawchart_db.html" %};
+                </script>
+                <script type="text/javascript">
+                    window.onload = function() { document.getElementById("time").innerHTML = moment().toString(); };
+                </script>
+		</head>
+		<body>
+				<h1>Aquametrics</h1>
+				<div>{{message}}</div></br>
+				<div>Graphs' dates and times plotted at this timezone:</div></br>
+				<div id='time'></div></br>
+				<div id='chartdiv_1'></div>
+				<div id='chartdiv_2'></div>
+				<div id='chartdiv_3'></div>
+				<div id='chartdiv_4'></div>
+		</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+		<head>
+		        {% load static %}
+				<title>Aquametrics Journal</title>
+                <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+                <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+                <link rel="stylesheet" href="{% static 'journal/journal.css' %}"><link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+                <link href="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.44/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+                <script src="//cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
+                <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+                <script src="//cdn.bootcss.com/moment.js/2.17.1/moment.min.js"></script>
+                <script src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.44/js/bootstrap-datetimepicker.min.js"></script>
+                <script>
+                    $(function () {
+                        $('.datetime-input').datetimepicker({
+                            format:'YYYY-MM-DD HH:mm:ss'
+                        });
+                    });
+                </script>
+		</head>
+        <body>
+            <div class="page-header">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'post_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
+                    <p class="top-menu">Hello {{ user.username }} <small>(<a href="{% url 'logout' %}">Log out</a>)</small></p>
+                {% else %}
+                    <a href="{% url 'login' %}" class="top-menu"><span class="glyphicon glyphicon-lock"></span></a>
+                {% endif %}
+                <h1><a href="/journal">Aquametrics Journal</a></h1>
+            </div>
+            <div class="content container">
+                <div class="row">
+                    <div class="col-md-8">
+                    {% block content %}
+                        <h1>{{new_or_edit}} post</h1>
+                        <form method="POST" class="post-form">{% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="save btn btn-default">Save</button>
+                        </form>
+                    {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </body>
+</html>

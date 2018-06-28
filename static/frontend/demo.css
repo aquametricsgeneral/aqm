@@ -1,0 +1,50 @@
+/* Show it is fixed to the top */
+body {
+  min-height: 100%;
+  padding-top: 5rem;
+}
+
+.bg-light {
+  background-color: #e6ffe6 !important;
+}
+
+.dropdown-menu {
+  width: 100%;
+  background-color: #FFFFFF;
+  color: #000000;
+  border-color: #3CB371;
+}
+
+#dropdownMenuButton_sensor{
+ width: 100%;
+ background-color: #FFFFFF;
+ color: #000000;
+ border-color: #3CB371;
+}
+
+#dropdownMenuButton_duration{
+ width: 100%;
+ background-color: #FFFFFF;
+ color: #000000;
+ border-color: #3CB371;
+}
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+           background-color:#e6ffe6;
+}
+
+#navbarCollapse{
+  text-align: right;
+}
+
+.form-label > input {
+  display: inline-block;
+  border: none;
+  text-align: center;
+  width: 200px;
+}
+
+.state > label {
+  display: inline-block;
+  width: 50px;
+}

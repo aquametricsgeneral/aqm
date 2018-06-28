@@ -1,0 +1,543 @@
+function round(value, decimals) {
+                return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+                }
+
+function drawChart(sensor_id, chartdiv, minValue, maxValue, greenF, greenT) {
+            $.ajax({
+                type: "GET",
+                url: "/graph/ajax_data_for_gauge/",
+                dataType: "json",
+                data: {'sensor_id': sensor_id},
+            }).done(function(result){
+                var jsonData = result;
+
+                console.log(jsonData)
+
+                var data = new google.visualization.DataTable();
+
+                var SensorArray = jsonData;
+
+                for (var i=0, len=SensorArray.length; i<len; i++) {
+                SensorArray[i][1] = Number(SensorArray[i][1]);
+                };
+
+                data.addColumn('string', 'Label');
+                data.addColumn('number', 'Value');
+                data.addRows(SensorArray);
+
+                var options = {
+                min: minValue,
+                max: maxValue,
+                width: 150, height: 150,
+                greenFrom: greenF, greenTo: greenT,
+                minorTicks: 10
+                };
+
+                var chart = new google.visualization.Gauge(document.getElementById(chartdiv));
+
+                chart.draw(data, options);
+            });
+        }
+
+function drawChart1(sensor_id, sensor_axis_label, vAxis_min, vAxis_max, line_color, graph_title, chart_div) {
+            $.ajax({
+            type: "GET",
+            url: "/graph/ajax_data_for_linechart/",
+            dataType: "json",
+            data: {'sensor_id': sensor_id},
+            }).done(function(result) {
+
+                console.log(result)
+
+                var data = new google.visualization.DataTable();
+                var SensorArray = result;
+
+                for (var i=0, len=SensorArray.length; i<len; i++) {
+                    SensorArray[i][0] = new Date(SensorArray[i][0]);
+                    SensorArray[i][1] = Number(SensorArray[i][1]);
+                };
+
+                data.addColumn('datetime', 'Date and Time');
+                data.addColumn('number', sensor_axis_label);
+                data.addRows(SensorArray);
+
+                var options = {
+                    title: graph_title,
+                    width: 900,
+                    height: 300,
+                    colors: [line_color],
+                    legend: {position: 'top'},
+                    // explorer: {},
+
+                    hAxis: {
+                    format: "HH:mm",
+                    gridlines: {color: 'transparent'},
+                    },
+
+                    vAxis: {
+                    gridlines: {count: 10},
+                    minValue: vAxis_min,
+                    maxValue: vAxis_max,
+                    ticks: [4,5,6,7,8],
+                    }
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById(chart_div));
+
+                chart.draw(data, options);
+                });
+            }
+
+function drawChart2(sensor_id1, sensor_id2,
+                    sensor1_label, sensor2_label,
+                    line_color1, line_color2,
+                    graph_title, chart_div) {
+
+                var a1 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id1},
+                        })
+
+                var a2 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id2},
+                        })
+
+                $.when(a1, a2).done(function(r1, r2) {
+
+                console.log(r1[0]);
+                console.log(r2[0]);
+
+                var data1 = new google.visualization.DataTable();
+                var data2 = new google.visualization.DataTable();
+
+                var SensorArray1 = r1[0];
+                var SensorArray2 = r2[0];
+
+                for (var i=0, len=SensorArray1.length; i<len; i++) {
+                    SensorArray1[i][0] = new Date(SensorArray1[i][0]);
+                    SensorArray1[i][1] = Number(SensorArray1[i][1]);
+                };
+
+                for (var i=0, len=SensorArray2.length; i<len; i++) {
+                    SensorArray2[i][0] = new Date(SensorArray2[i][0]);
+                    SensorArray2[i][1] = Number(SensorArray2[i][1]);
+                };
+
+                data1.addColumn('datetime', 'Date and Time');
+                data1.addColumn('number', sensor1_label);
+                data1.addRows(SensorArray1);
+
+                data2.addColumn('datetime', 'Date and Time');
+                data2.addColumn('number', sensor2_label);
+                data2.addRows(SensorArray2);
+
+                var data12 = google.visualization.data.join(data1, data2, 'full', [[0, 0]], [1], [1]);
+
+                var options = {
+                    title: graph_title,
+                    width: 900,
+                    height: 300,
+                    legend: {position: 'top'},
+                    interpolateNulls: true,
+                    // explorer: {},
+
+                    hAxis: {format: "HH:mm",
+                            gridlines: {color: 'transparent'},
+                            },
+
+                    vAxes: {0: {viewWindowMode:'explicit',
+                                viewWindow:{
+                                            max:8,
+                                            min:4
+                                            },
+                                gridlines: {count: 10},
+                                ticks: [4,5,6,7,8],
+                                },
+                            1: {viewWindow:{
+                                            max:10,
+                                            min:1
+                                            },
+                                gridlines: {color: 'transparent'},
+                                ticks: [1,2,3,4,5,6,7,8,9,10],
+                                },
+                            },
+
+                    // series 0,1,2 corresponds to data 1,2,3
+                    series: {0: {targetAxisIndex:0},
+                             1: {targetAxisIndex:1},
+                             },
+                    colors: [line_color1, line_color2],
+                    };
+
+                var chart = new google.visualization.LineChart(document.getElementById(chart_div));
+
+                chart.draw(data12, options)
+
+                });
+
+                }
+
+function drawChart3A(sensor_id1, sensor_id2, sensor_id3,
+                    sensor1_label, sensor2_label, sensor3_label,
+                    line_color1, line_color2, line_color3,
+                    graph_title, chart_div) {
+
+                var a1 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id1},
+                        })
+
+                var a2 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id2},
+                        })
+
+                var a3 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id3},
+                        })
+
+                $.when(a1, a2, a3).done(function(r1, r2, r3) {
+
+                console.log(r1[0]);
+                console.log(r2[0]);
+                console.log(r3[0]);
+
+                var data1 = new google.visualization.DataTable();
+                var data2 = new google.visualization.DataTable();
+                var data3 = new google.visualization.DataTable();
+
+                var SensorArray1 = r1[0];
+                var SensorArray2 = r2[0];
+                var SensorArray3 = r3[0];
+
+                for (var i=0, len=SensorArray1.length; i<len; i++) {
+                    SensorArray1[i][0] = new Date(SensorArray1[i][0]);
+                    SensorArray1[i][1] = Number(SensorArray1[i][1]);
+                };
+
+                for (var i=0, len=SensorArray2.length; i<len; i++) {
+                    SensorArray2[i][0] = new Date(SensorArray2[i][0]);
+                    SensorArray2[i][1] = Number(SensorArray2[i][1]);
+                };
+
+                for (var i=0, len=SensorArray3.length; i<len; i++) {
+                    SensorArray3[i][0] = new Date(SensorArray3[i][0]);
+                    SensorArray3[i][1] = Number(SensorArray3[i][1]);
+                };
+
+                data1.addColumn('datetime', 'Date and Time');
+                data1.addColumn('number', sensor1_label);
+                data1.addRows(SensorArray1);
+
+                data2.addColumn('datetime', 'Date and Time');
+                data2.addColumn('number', sensor2_label);
+                data2.addRows(SensorArray2);
+
+                data3.addColumn('datetime', 'Date and Time');
+                data3.addColumn('number', sensor3_label);
+                data3.addRows(SensorArray3);
+
+                var data12 = google.visualization.data.join(data1, data2, 'full', [[0, 0]], [1], [1]);
+
+                var data123 = google.visualization.data.join(data12, data3, 'full', [[0, 0]], [1, 2], [1]);
+
+                var options = {
+                    title: graph_title,
+                    width: 900,
+                    height: 300,
+                    legend: {position: 'top'},
+                    interpolateNulls: true,
+                    // explorer: {},
+
+                    hAxis: {format: "HH:mm",
+                            gridlines: {color: 'transparent'},
+                            },
+
+                    vAxes: {0: {viewWindowMode:'explicit',
+                                viewWindow:{
+                                            max:40,
+                                            min:20
+                                            },
+                                gridlines: {count: 10},
+                                ticks: [20,25,30,35,40]
+                                },
+                            1: {viewWindow:{
+                                            max:100,
+                                            min:40
+                                            },
+                                ticks: [50,55,60,65,70,75,80,85,90,95,100],
+                                gridlines: {color: 'transparent'},
+                                },
+                            },
+
+                    // series 0,1,2 corresponds to data 1,2,3
+                    series: {0: {targetAxisIndex:0},
+                             1: {targetAxisIndex:0},
+                             2: {targetAxisIndex:1}
+                             },
+                    colors: [line_color1, line_color2, line_color3],
+                    };
+
+                var chart = new google.visualization.LineChart(document.getElementById(chart_div));
+
+                chart.draw(data123, options)
+
+                });
+
+                }
+
+function drawChart3B(sensor_id1, sensor_id2, sensor_id3,
+                    sensor1_label, sensor2_label, sensor3_label,
+                    line_color1, line_color2, line_color3,
+                    graph_title, chart_div) {
+
+                var a1 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id1},
+                        })
+
+                var a2 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id2},
+                        })
+
+                var a3 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id3},
+                        })
+
+                $.when(a1, a2, a3).done(function(r1, r2, r3) {
+
+                console.log(r1[0]);
+                console.log(r2[0]);
+                console.log(r3[0]);
+
+                var data1 = new google.visualization.DataTable();
+                var data2 = new google.visualization.DataTable();
+                var data3 = new google.visualization.DataTable();
+
+                var SensorArray1 = r1[0];
+                var SensorArray2 = r2[0];
+                var SensorArray3 = r3[0];
+
+                for (var i=0, len=SensorArray1.length; i<len; i++) {
+                    SensorArray1[i][0] = new Date(SensorArray1[i][0]);
+                    SensorArray1[i][1] = Number(SensorArray1[i][1])*1;
+                };
+
+                for (var i=0, len=SensorArray2.length; i<len; i++) {
+                    SensorArray2[i][0] = new Date(SensorArray2[i][0]);
+                    SensorArray2[i][1] = Number(SensorArray2[i][1])*2;
+                };
+
+                for (var i=0, len=SensorArray3.length; i<len; i++) {
+                    SensorArray3[i][0] = new Date(SensorArray3[i][0]);
+                    SensorArray3[i][1] = (Number(SensorArray3[i][1])*-3)+3;
+                };
+
+                data1.addColumn('datetime', 'Date and Time');
+                data1.addColumn('number', sensor1_label);
+                data1.addRows(SensorArray1);
+
+                data2.addColumn('datetime', 'Date and Time');
+                data2.addColumn('number', sensor2_label);
+                data2.addRows(SensorArray2);
+
+                data3.addColumn('datetime', 'Date and Time');
+                data3.addColumn('number', sensor3_label);
+                data3.addRows(SensorArray3);
+
+                var data12 = google.visualization.data.join(data1, data2, 'full', [[0, 0]], [1], [1]);
+
+                var data123 = google.visualization.data.join(data12, data3, 'full', [[0, 0]], [1, 2], [1]);
+
+                var options = {
+                    title: graph_title,
+                    width: 900,
+                    height: 300,
+                    legend: {position: 'none'},
+                    interpolateNulls: true,
+                    // explorer: {},
+
+                    hAxis: {format: "HH:mm",
+                            gridlines: {color: 'transparent'},
+                            },
+
+                    vAxes: {0: {viewWindowMode:'explicit',
+                                viewWindow:{
+                                            max:3,
+                                            min:0
+                                            },
+                                gridlines: {count: 3},
+                                ticks: [{v:0, f:'low'}, {v:1, f:'mid'}, {v:2, f:'full'}, {v:3, f:'filling'}],
+                                },
+
+                            },
+
+                    // series 0,1,2 corresponds to data 1,2,3
+                    series: {0: {targetAxisIndex:0},
+                             1: {targetAxisIndex:0},
+                             2: {targetAxisIndex:0}
+                             },
+                    colors: [line_color1, line_color2, line_color3],
+                    };
+
+                var chart = new google.visualization.AreaChart(document.getElementById(chart_div));
+
+                chart.draw(data123, options)
+
+                });
+
+                }
+
+function drawChart4(sensor_id1, sensor_id2, sensor_id3, sensor_id4,
+                    sensor1_label, sensor2_label, sensor3_label, sensor4_label,
+                    line_color1, line_color2, line_color3, line_color4,
+                    graph_title, chart_div) {
+
+                var a1 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id1},
+                        })
+
+                var a2 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id2},
+                        })
+
+                var a3 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id3},
+                        })
+
+                var a4 = $.ajax({
+                            type: "GET",
+                            url: "/graph/ajax_data_for_linechart/",
+                            dataType: "json",
+                            data: {'sensor_id': sensor_id4},
+                        })
+
+                $.when(a1, a2, a3, a4).done(function(r1, r2, r3, r4) {
+
+                console.log(r1[0]);
+                console.log(r2[0]);
+                console.log(r3[0]);
+                console.log(r4[0]);
+
+                var data1 = new google.visualization.DataTable();
+                var data2 = new google.visualization.DataTable();
+                var data3 = new google.visualization.DataTable();
+                var data4 = new google.visualization.DataTable();
+
+                var SensorArray1 = r1[0];
+                var SensorArray2 = r2[0];
+                var SensorArray3 = r3[0];
+                var SensorArray4 = r4[0];
+
+                // multiply by flow factor for fisk tank flow
+                for (var i=0, len=SensorArray1.length; i<len; i++) {
+                    SensorArray1[i][0] = new Date(SensorArray1[i][0]);
+                    SensorArray1[i][1] = round(Number(SensorArray1[i][1])*0.13,2);
+                };
+
+                // multiply by flow factor for main flow
+                for (var i=0, len=SensorArray2.length; i<len; i++) {
+                    SensorArray2[i][0] = new Date(SensorArray2[i][0]);
+                    SensorArray2[i][1] = round(Number(SensorArray2[i][1])*2.22,2);
+                };
+
+                // multiply by flow factor for vertical flow
+                for (var i=0, len=SensorArray3.length; i<len; i++) {
+                    SensorArray3[i][0] = new Date(SensorArray3[i][0]);
+                    SensorArray3[i][1] = round(Number(SensorArray3[i][1])*0.13,2);
+                };
+
+                // multiply by flow factor for horizontal flow
+                for (var i=0, len=SensorArray4.length; i<len; i++) {
+                    SensorArray4[i][0] = new Date(SensorArray4[i][0]);
+                    SensorArray4[i][1] = round(Number(SensorArray4[i][1])*0.13,2);
+                };
+
+                data1.addColumn('datetime', 'Date and Time');
+                data1.addColumn('number', sensor1_label);
+                data1.addRows(SensorArray1);
+
+                data2.addColumn('datetime', 'Date and Time');
+                data2.addColumn('number', sensor2_label);
+                data2.addRows(SensorArray2);
+
+                data3.addColumn('datetime', 'Date and Time');
+                data3.addColumn('number', sensor3_label);
+                data3.addRows(SensorArray3);
+
+                data4.addColumn('datetime', 'Date and Time');
+                data4.addColumn('number', sensor4_label);
+                data4.addRows(SensorArray4);
+
+                var data12 = google.visualization.data.join(data1, data2, 'full', [[0, 0]], [1], [1]);
+
+                var data123 = google.visualization.data.join(data12, data3, 'full', [[0, 0]], [1, 2], [1]);
+
+                var data1234 = google.visualization.data.join(data123, data4, 'full', [[0, 0]], [1, 2, 3], [1]);
+
+                var options = {
+                    title: graph_title,
+                    width: 900,
+                    height: 300,
+                    legend: {position: 'top'},
+                    interpolateNulls: true,
+
+                    hAxis: {format: "HH:mm",
+                            gridlines: {color: 'transparent'},
+                            },
+
+                    vAxes: {0: {viewWindowMode:'explicit',
+                                viewWindow:{
+                                            max:16,
+                                            min:0
+                                            },
+                                gridlines: {count: 3},
+                                ticks: [0,2,4,6,8,10,12,14,16]
+                                },
+                            },
+
+                    // series 0,1,2 corresponds to data 1,2,3
+                    series: {0: {targetAxisIndex:0},
+                             1: {targetAxisIndex:0},
+                             2: {targetAxisIndex:0},
+                             3: {targetAxisIndex:0}
+                             },
+                    colors: [line_color1, line_color2, line_color3, line_color4],
+                    };
+
+                var chart = new google.visualization.LineChart(document.getElementById(chart_div));
+
+                chart.draw(data1234, options)
+
+                });
+
+                }

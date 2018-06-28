@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+      {% load static %}
+
+    <title>Aquametrics Trend</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'trend/trend.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bokeh/0.12.15/bokeh.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bokeh/0.12.15/bokeh-widgets.min.css" type="text/css"/>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/0.12.15/bokeh.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/0.12.15/bokeh-widgets.min.js"></script>
+
+    </head>
+
+    <body>
+
+    <script>
+        $( document ).ready(function() {
+            $.ajax({
+                type: "GET",
+                url: "/trend/ajax_overlay/",
+                data: {'sensor_id': 'EnvHumidity'},
+                dataType: "json",
+                }).done(function(result) {
+                var bokeh_json = result;
+                var bokeh_script = bokeh_json['script'];
+                var bokeh_div = bokeh_json['div'];
+
+                var range = document.createRange();
+                // make the parent of the first div in the document becomes the context node
+                range.selectNode(document.getElementsByTagName("div").item(0));
+                var documentFragment1 = range.createContextualFragment(bokeh_div);
+                var documentFragment2 = range.createContextualFragment(bokeh_script);
+                document.body.appendChild(documentFragment1);
+                document.body.appendChild(documentFragment2);
+            });
+        });
+    </script>
+
+    <div></div>
+
+    </body>
+</html>
