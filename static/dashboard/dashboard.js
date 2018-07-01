@@ -46,13 +46,20 @@ $( document ).ajaxStart(function() {
 function updateGauge(sensor_id, gauge_id) {
         $.ajax({
             type: "GET",
-            url: "/graph/ajax_data_for_gauge/",
+            url: "/dashboard/ajax_data_for_gauge/",
             dataType: "json",
             data: {'sensor_id': sensor_id},
         }).done(function(result){
             var jsonData = result;
-            var gaugeValue = jsonData[0][1];
+            var gaugeValue = jsonData['gauge_value'];
+            //console.log(gaugeValue);
+            var lowerlimit = jsonData['lowerlimit'];
+            var upperlimit = jsonData['upperlimit'];
+            var limits = [{from: parseFloat(lowerlimit), to: parseFloat(upperlimit), color: "rgb(153, 255, 153)"}];
+            var data_highlights = JSON.stringify(limits);
+            //console.log(data_highlights);
             gauge_id.setAttribute('data-value', gaugeValue);
+            gauge_id.setAttribute('data-highlights', data_highlights);
         });
 }
 
@@ -64,6 +71,7 @@ function checkWaterLevel(gauge_id) {
         }).done(function(result){
             var jsonData = result;
             var gaugeValue = jsonData['waterlevel_value']
+            //console.log(gaugeValue);
             gauge_id.setAttribute('data-value', gaugeValue);
         });
 }

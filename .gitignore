@@ -10,3 +10,4 @@ nano.save
 node.status
 ph.counter
 uwsgi_params
+www/settings.py

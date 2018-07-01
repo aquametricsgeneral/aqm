@@ -3,162 +3,12 @@ from celery.task.schedules import crontab
 from celery.decorators import periodic_task
 from datetime import datetime
 
+
 app = Celery()
 
 
-
-##@periodic_task(run_every=(crontab(minute='*/1')), name="other_task", ignore_result=True)
-##def other_task():
-##    f = open("/home/aquametrics/celery_other","a")
-##    f.write(datetime.now().strftime("%d-%m %H:%M:%S"))
-##    f.write("\t")
-##    f.write("Hello World")
-##    f.write("\n")
-##    f.close()
-##    print("{}  Hello World!".format(datetime.now().strftime("%d-%m %H:%M:%S")))
-##
-##@periodic_task(run_every=(crontab(minute='*/1')), name="some_task", ignore_result=True)
-##def some_task():
-##    f = open("/home/aquametrics/celery_some","a")
-##    f.write(datetime.now().strftime("%d-%m %H:%M:%S"))
-##    f.write("\t")
-##    f.write("Hello World")
-##    f.write("\n")
-##    f.close()
-##    print("{}  Hello World!".format(datetime.now().strftime("%d-%m %H:%M:%S")))
-
-
-        
-
-##@periodic_task(run_every=(crontab(minute='*/1')), name="ph_task", ignore_result=True)
-##def ph_task():
-##    import os
-##    import sys
-##    import teleport
-##
-##    path = '/home/aquametrics/www'
-##    if path not in sys.path:
-##        sys.path.append(path)
-##
-##    os.environ['DJANGO_SETTINGS_MODULE']='www.settings'
-##
-##    from django.core.wsgi import get_wsgi_application
-##    application = get_wsgi_application()
-##
-##    #lines above this are similar to wsgi, needed for standalone django script
-##
-##    from django.core.mail import send_mail
-##    from django.apps import apps
-##    from django.utils import timezone
-##    import pytz
-##    import time
-##
-##    def main():
-##        alertPH('WaterPH', 6.0)
-##
-##    def alertPH(sensor_id, alert_value):
-##
-##        sensor_model = apps.get_model("graph", sensor_id)
-##        alert_value = alert_value
-##        timezone.activate(pytz.timezone("Asia/Singapore"))
-##        now = timezone.localtime(timezone.now())
-##
-##        node_status_path  ="/home/aquametrics/www/ph.counter"
-##    
-##        f = open(node_status_path,"r")
-##        counter = int(f.readlines()[0])
-##        f.close()
-##
-##        print('Time now: ' + now.strftime("%I:%M:%S %p"))
-##        print('Alert value: ' + str(alert_value))
-##        print('Starting counter value: ' + str(counter))
-##
-##        if counter < 10:
-##            sensor_query = sensor_model.objects.all().order_by('datetime').reverse()[:1]
-##            sensor_query = sensor_query.values('value')
-##            current_value = sensor_query[0]['value']
-##
-##            if current_value <= alert_value:
-##                now = timezone.localtime(timezone.now())
-##                counter += 1
-##                print('current pH value: ' + str(current_value))
-##                print('counter: ' + str(counter))
-##                
-##
-##            else:
-##                now = timezone.localtime(timezone.now())
-##                counter = 0
-##                print('current pH value: ' + str(current_value))
-##                print('counter reset to: ' + str(counter))
-##                
-##            f = open(node_status_path,"w")
-##            f.write(str(counter))
-##            f.close()
-##            
-##        else:
-##
-##            if counter == 10:
-##
-##                counter +=1
-##                
-##                print('Sending email alert...')
-##                send_mail(
-##                    'LOW WATER PH ALERT',
-##                    'Water pH value is lower than ' + str(alert_value) + ' for more than 10 minutes.',
-##                    'aquametricsgeneral@gmail.com',
-##                    ['tengthuan@gmail.com', 'hongjin86@gmail.com'],
-##                    fail_silently=False,
-##                    )
-##                print('Email alert sent. Going to sleep for 1 hour before checking the pH again.')
-##
-##                
-##
-##            elif counter > 10 and counter < 60:
-##                counter +=1
-##
-##            else:
-##                counter = 0
-##
-##            f = open(node_status_path,"w")
-##            f.write(str(counter))
-##            f.close()         
-##
-##
-##    main()
-
-
-def retrive_limit(sensor_id):
-
-    import pytz
-    import time
-    import os
-    import sys
-    import teleport
-    
-    path = '/home/aquametrics/www'
-    if path not in sys.path:
-        sys.path.append(path)
-
-    os.environ['DJANGO_SETTINGS_MODULE']='www.settings'
-
-    from django.core.wsgi import get_wsgi_application
-    application = get_wsgi_application()
-
-    from django.apps import apps
-    from django.utils import timezone
-
-    threshold_db = apps.get_model("graph", sensor_id)
-
-    
-    threshold = threshold_db.objects.values('sensor')
-
-    print(listthreshold)
-    
-
-
-
-@periodic_task(run_every=(crontab(minute='*/2')), name="temp_task", ignore_result=True)
-def temp_task():
+@periodic_task(run_every=(crontab(minute='*/2')), name="aquametrics_monitor_task", ignore_result=True)
+def aquametrics_monitor_task():
     import os
     import sys
     import teleport
@@ -180,10 +30,9 @@ def temp_task():
 
     from django.core.mail import send_mail
     from django.apps import apps
-    from django.utils import timezone
+    from django.utils import timezone, dateparse
     import pytz
     import time
-
 
     sensor_type = apps.get_model("monitor", "alertsetting")
     sensor = sensor_type.objects.all()
@@ -197,12 +46,107 @@ def temp_task():
         timezone.activate(pytz.timezone("Asia/Singapore"))
         now = timezone.localtime(timezone.now())
 
-        print('Time now: ' + now.strftime("%I:%M:%S %p"))
+#        print('Time now: ' + now.strftime("%I:%M:%S %p"))
 
+        ### @@@ Check System STATUS @@@ ###
+        #print("Checking Sensor Node Status...")
         sensor_query = sensor_model.objects.all().order_by('datetime').reverse()[:1]
+
+        last_update_time = list(sensor_query.values('datetime'))
+
+#        print("time last update: {} ".format(last_update_time[0]['datetime']))
+
+        last_update_time = timezone.localtime(last_update_time[0]['datetime'])
+
+        last_update_duration = int((now - last_update_time).total_seconds())
+        
+        node_status_path  ="/home/aquametrics/www/node.status"
+
+        f = open(node_status_path,"r")
+        status_in_file = f.readlines()
+        f.close()
+
+        status_in_file = status_in_file[0].split("\t")
+
+        sys_status =status_in_file[0]
+        down_up_time = dateparse.parse_datetime(status_in_file[1])
+        notified_time = dateparse.parse_datetime(status_in_file[2])
+        no_of_notification = int(status_in_file[3])
+
+        last_notification_duration = int((now - notified_time).total_seconds())
+
+#        print("last notification: {}".format(last_notification_duration))
+
+        total_down_up_duration = int((now - down_up_time).total_seconds())
+
+
+        if last_update_duration > 600 and sys_status == "1":
+
+            no_of_notification = 0
+
+            f = open(node_status_path,"w")
+            f.write("0")
+            f.write("\t")
+            f.write(str(last_update_time))
+            f.write("\t")
+            f.write(str(now))
+            f.write("\t")
+            f.write(str(no_of_notification))
+            f.close()
+
+            msg="Sensor Node is OFFLINE! Warning: Alert Notification Will be Disabled"
+
+            bot.sendMessage(chat_id=channel, text=msg)
+
+            print("Node is offline")
+
+        elif last_update_duration > 600 and sys_status == "0" and last_notification_duration > 7200:
+
+            no_of_notification = no_of_notification + 1
+
+            f = open(node_status_path,"w")
+            f.write("0")
+            f.write("\t")
+            f.write(str(last_update_time))
+            f.write("\t")
+            f.write(str(now))
+            f.write("\t")
+            f.write(str(no_of_notification))
+            f.close()
+
+            msg="This is #{} Notification/s. Sensor Node is still offline since {} - {}sec. Warning: Alert Notification Is Still Disabled".format(str(no_of_notification),str(last_update_time),total_down_up_duration)
+
+            bot.sendMessage(chat_id=channel, text=msg)
+
+            print("This is #{} Notification/s. Node is still offline since {} - {}sec".format(str(no_of_notification),str(last_update_time),total_down_up_duration))
+            
+        elif last_update_duration <= 600 and sys_status == "0":
+            
+            no_of_notification = 0
+            
+            f = open(node_status_path,"w")
+            f.write("1")
+            f.write("\t")
+            f.write(str(now))
+            f.write("\t")
+            f.write(str(now))
+            f.write("\t")
+            f.write(str(no_of_notification))    
+            f.close()
+
+            msg="Sensor Node is back ONLINE. Total down time is {}sec".format(total_down_up_duration)
+
+            bot.sendMessage(chat_id=channel, text=msg)
+
+            print('Node is back ONLINE.. total down time is {}sec'.format(total_down_up_duration))
+
+        ### @@@ END - Check System STATUS @@@ ###
+            
+        ### @@@ Monitor Alert @@@ ###
+        #print("Checking Alert Status...")
         alert_setting = list(sensor_query.values('alert'))
 
-        if alert_setting[0]['alert'] == True:
+        if alert_setting[0]['alert'] == True and sys_status == "1":
             
             query_10 = sensor_model.objects.all().order_by('datetime').reverse()[:10]
             withinlimit = list(query_10.values('withinlimit'))
@@ -236,20 +180,7 @@ def temp_task():
 
                     print("sending {} alarm".format(sensor_id))
 
-                
-            
-##                print('Sending email alert...')
-##                send_mail(
-##                    'LOW WATER PH ALERT',
-##                    'Water pH value is lower than ' + str(alert_value) + ' for more than 10 minutes.',
-##                    'aquametricsgeneral@gmail.com',
-##                    ['tengthuan@gmail.com', 'hongjin86@gmail.com'],
-##                    fail_silently=False,
-##                    )
-##                print('Email alert sent. Going to sleep for 1 hour before checking the pH again.')
-
-
-        
+      ### @@@ END - Monitor Alert @@@ ### 
 
 
 

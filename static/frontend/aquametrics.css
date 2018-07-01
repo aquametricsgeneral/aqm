@@ -44,6 +44,11 @@ a { color: inherit; }
   margin-bottom: 8rem;
 }
 
+.reset-container {
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+}
+
 #save-btn {
   margin-bottom: 4rem;
 }
@@ -125,4 +130,8 @@ outline: none;
 .state > label {
   display: inline-block;
   width: 50px;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child:before, table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th:first-child:before {
+  background-color: #1380FC !important;
 }

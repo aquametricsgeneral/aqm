@@ -34,43 +34,43 @@ var table = $('#statusTable').DataTable({
 
                       switch (data) {
                         case 'EnvTemp':
-                          data = 'Air Temperature';
+                          data = '<span class="fas fa-thermometer-half mr-1" style="color: #1380FC"></span>Temperature - Air';
                           break;
 
                         case 'WaterTempFishTank':
-                          data = 'Fish Tank Temperature';
+                          data = '<span class="fas fa-thermometer-half mr-1" style="color: #1380FC"></span>Temperature - Fish Tank';
                           break;
 
                         case 'WaterTempSumpTank':
-                          data = 'Sump Tank Temperature';
+                          data = '<span class="fas fa-thermometer-half mr-1" style="color: #1380FC"></span>Temperature - Sump Tank';
                           break;
 
                         case 'EnvHumidity':
-                          data = 'Humidity';
+                          data = '<span class="fas fa-cloud mr-1" style="color: #1380FC"></span>Humidity';
                           break;
 
                         case 'WaterPH':
-                          data = 'Water pH';
+                          data = '<span class="fas fa-vial mr-1" style="color: #1380FC"></span>Water pH';
                           break;
 
                         case 'WaterFlowMain':
-                          data = 'Main Flow';
+                          data = '<span class="fas fa-tint mr-1" style="color: #1380FC"></span>Flow - Main';
                           break;
 
                         case 'WaterFlowFishTank':
-                          data = 'Fish Tank Flow';
+                          data = '<span class="fas fa-tint mr-1" style="color: #1380FC"></span>Flow - Fish Tank';
                           break;
 
                         case 'WaterFlowHorizGrow':
-                          data = 'Horizontal Flow';
+                          data = '<span class="fas fa-tint mr-1" style="color: #1380FC"></span>Flow - Horizontal';
                           break;
 
                         case 'WaterFlowVertGrow':
-                          data = 'Vertical Flow';
+                          data = '<span class="fas fa-tint mr-1" style="color: #1380FC"></span>Flow - Vertical';
                           break;
 
                         case 'IsFilling':
-                          data = 'Water Filling';
+                          data = '<span class="fas fa-filter mr-1" style="color: #1380FC"></span>Water Filling';
                           break;
 
                         default:
